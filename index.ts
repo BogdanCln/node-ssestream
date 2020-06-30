@@ -1,4 +1,4 @@
-import { Transform } from 'stream'
+import { Transform, TransformOptions } from 'stream'
 import { IncomingMessage, OutgoingHttpHeaders } from "http"
 
 function dataString(data: string|object): string {
@@ -35,8 +35,12 @@ export type HeaderStream = NodeJS.WritableStream & WriteHeaders
  * If this stream is piped to an HTTP Response, it will set appropriate headers.
  */
 export default class SseStream extends Transform {
-  constructor(req?: IncomingMessage) {
-    super({ objectMode: true })
+  constructor(req?: IncomingMessage, streamOpts?: TransformOptions) {
+    if(streamOpts === undefined) 
+      streamOpts = { objectMode: true }
+    else
+      streamOpts.objectMode = true;
+    super(streamOpts);
     if (req) {
       req.socket.setKeepAlive(true)
       req.socket.setNoDelay(true)
